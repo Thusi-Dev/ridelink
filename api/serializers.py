@@ -2,7 +2,10 @@ from rest_framework import serializers
 
 
 
-from .models import User, Driver, Review, Ride, CustomerReview, Parcel
+
+
+
+from .models import User, Driver, Review, Ride, CustomerReview, Parcel, Driver
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,7 +18,8 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
         fields = ['id', 'user', 'license_number']
-
+        
+"""
 class RideSerializer(serializers.ModelSerializer):
 	pickup_location = serializers.ReadOnlyField(source='pickup_location')
 	dropoff_location = serializers.ReadOnlyField(source='destination')
@@ -25,6 +29,7 @@ class RideSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Ride
 		fields = ['id', 'driver', 'user', 'pickup_location', 'dropoff_location', 'ride_type', 'status']
+"""
 
 class ReviewSerializer(serializers.ModelSerializer):
     driver = DriverSerializer()
@@ -42,8 +47,10 @@ class CustomerReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerReview
 
+
         fields = ['id', 'driver', 'customer', 'ride', 'rating', 'review', 'created_at']
 
+"""
 class ParcelSerializer(serializers.ModelSerializer):
     pickup_location = serializers.ReadOnlyField(source='pickup_location')
     dropoff_location = serializers.ReadOnlyField(source='dropoff_location')
@@ -52,7 +59,6 @@ class ParcelSerializer(serializers.ModelSerializer):
         model = Parcel
         fields = ['id', 'ride', 'parcel_type', 'parcel_description', 'parcel_weight', 'parcel_dimensions', 'status', 'pickup_location', 'dropoff_location']
 
-"""
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
@@ -63,6 +69,7 @@ class LoginSerializer(serializers.Serializer):
             return user
         raise serializers.ValidationError('Invalid credentials')
 """
+
 from django.contrib.auth import authenticate
 
 class LoginSerializer(serializers.Serializer):
@@ -88,8 +95,35 @@ class RegisterSerializer(serializers.ModelSerializer):
             return User.objects.create_user(**validated_data)
         except IntegrityError:
             raise serializers.ValidationError('Username or email already exists')
-            
+
+# Ride Serializer
+class RideSerializer(serializers.ModelSerializer):
+    pickup_location = serializers.ReadOnlyField(source='pickup_location')
+    dropoff_location = serializers.ReadOnlyField(source='dropoff_location')
+    driver = DriverSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = Ride
+        fields = ['id', 'driver', 'user', 'pickup_location', 'dropoff_location', 'ride_type', 'status']
+
+# RideCreate serializer
 class RideCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ride
         fields = ['pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'ride_type']
+        
+# Parcel serializer
+class ParcelSerializer(serializers.ModelSerializer):
+    ride = RideSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = Parcel
+        fields = '__all__'
+        
+# ParcelCreate serializer
+class ParcelCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parcel
+        fields = ['ride', 'parcel_type', 'parcel_weight', 'parcel_dimensions']

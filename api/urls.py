@@ -2,22 +2,26 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Ride URLs
-    path('rides/', views.RideList.as_view()),
-    path('rides/<int:pk>/', views.RideDetail.as_view()),
+    # Rides URLs
+    path('rides/', views.RideListView.as_view(), name= 'ride_list'),
+    path('rides/<int:pk>/', views.RideDetailView.as_view(), name= 'ride_detail'),
+    path('rides/request/', views.RideRequestView.as_view(), name= 'ride_request'),
 
-    # Review URLs
-    path('reviews/', views.ReviewList.as_view()),
-    path('reviews/<int:pk>/', views.ReviewDetail.as_view()),
+    # DriverReview URLs
+    path('reviews/', views.ReviewListView.as_view(), name= 'driver_review'),
+    path('reviews/<int:pk>/', views.ReviewDetailView.as_view(), name= 'driver_review_detail'),
 
     # CustomerReview URLs
-    path('customer-reviews/', views.CustomerReviewList.as_view()),
-    path('customer-reviews/<int:pk>/', views.CustomerReviewDetail.as_view()),
+    path('customer_reviews/', views.CustomerReviewListView.as_view()),
+    path('customer_reviews/<int:pk>/', views.CustomerReviewDetailView.as_view()),
     
     # Authentication and Authorization URLs
     path('register/', views.RegisterView.as_view()),
-    path('login/', views.CustomAuthToken.as_view()),
+    path('login/', views.CustomAuthTokenView.as_view()),
     
-    # Ride Booking URL
-    path('ride/',views.RideBookingView.as_view()),
+    # Parcel URLs
+    path('parcels/', views.ParcelListView.as_view(), name='parcel_list'),
+    path('parcels/<int:pk>/', views.ParcelDetailView.as_view(), name='parcel_detail'),
+    path('parcels/request/', views.ParcelRequestView.as_view(), name='parcel_request'),
+    
 ]

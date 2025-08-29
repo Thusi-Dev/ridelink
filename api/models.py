@@ -47,7 +47,8 @@ class Driver(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.vehicle_type}"
-
+        
+"""
 class Ride(models.Model):
     RIDE_TYPE_CHOICES = [
         ('personal', 'Personal'),
@@ -81,7 +82,8 @@ class Ride(models.Model):
 
     def __str__(self):
         return f"Ride {self.id} - {self.user.username}"
-        
+"""        
+
 class Review(models.Model):
     RATING_CHOICES = [
         (1, '1 star'),
@@ -118,17 +120,7 @@ class CustomerReview(models.Model):
 
     def __str__(self):
         return f"Review for {self.customer.username} by {self.driver.user.username}"
-
-#class Parcel(models.Model):
-#	ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
-#    parcel_type = models.CharField(max_length=255)
-#    parcel_description = models.TextField()
-#    parcel_weight = models.DecimalField(max_digits=5, decimal_places=2)
-#    parcel_dimensions = models.CharField(max_length=255)
-#    pickup_location = models.CharField(max_length=255)
-#    dropoff_location = models.CharField(max_length=255)
-#    status = models.CharField(max_length=255)
-
+        
 class Parcel(models.Model):
     ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
     parcel_type = models.CharField(max_length=255)
@@ -144,3 +136,54 @@ class Parcel(models.Model):
     @property
     def dropoff_location(self):
         return self.ride.destination
+
+# Request model
+class Request(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('in_transit', 'In Transit'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pickup_latitude = models.DecimalField(max_digits=10, decimal_places=7)
+    pickup_longitude = models.DecimalField(max_digits=10, decimal_places=7)
+    dropoff_latitude = models.DecimalField(max_digits=10, decimal_places=7)
+    dropoff_longitude = models.DecimalField(max_digits=10, decimal_places=7)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+
+    class Meta:
+        abstract = True
+
+# Ride model inheriting Request model
+class Ride(Request):
+    RIDE_TYPE_CHOICES = [
+        ('personal', 'Personal'),
+        ('shared', 'Shared'),
+        ('luxury', 'Luxury'),
+    ]
+
+    ride_type = models.CharField(max_length=100, choices=RIDE_TYPE_CHOICES)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def pickup_location(self):
+        return f"{self.pickup_latitude}, {self.pickup_longitude}"
+
+    @property
+    def dropoff_location(self):
+        return f"{self.dropoff_latitude}, {self.dropoff_longitude}"
+        
+# Parcel model inheriting Request model
+class Parcel(Request):
+    PARCEL_TYPE_CHOICES = [
+        ('documents', 'Documents'),
+        ('packages', 'Packages'),
+    ]
+
+    parcel_type = models.CharField(max_length=100, choices=PARCEL_TYPE_CHOICES)
+    parcel_weight = models.DecimalField(max_digits=5, decimal_places=2)
+    parcel_dimensions = models.CharField(max_length=255)
+    ride = models.ForeignKey(Ride, on_delete=models.CASCADE, null=True, blank=True)
