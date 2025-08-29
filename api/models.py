@@ -84,60 +84,6 @@ class Ride(models.Model):
         return f"Ride {self.id} - {self.user.username}"
 """        
 
-class Review(models.Model):
-    RATING_CHOICES = [
-        (1, '1 star'),
-        (2, '2 stars'),
-        (3, '3 stars'),
-        (4, '4 stars'),
-        (5, '5 stars'),
-    ]
-
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.IntegerField(choices=RATING_CHOICES)
-    review = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Review for {self.driver.user.username} by {self.user.username}"
-       
-class CustomerReview(models.Model):
-    RATING_CHOICES = [
-        (1, '1 star'),
-        (2, '2 stars'),
-        (3, '3 stars'),
-        (4, '4 stars'),
-        (5, '5 stars'),
-    ]
-
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='customer_reviews')
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_reviews')
-    ride = models.ForeignKey(Ride, on_delete=models.CASCADE, related_name='customer_reviews')
-    rating = models.IntegerField(choices=RATING_CHOICES)
-    review = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Review for {self.customer.username} by {self.driver.user.username}"
-
-"""      
-class Parcel(models.Model):
-    ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
-    parcel_type = models.CharField(max_length=255)
-    parcel_description = models.TextField()
-    parcel_weight = models.DecimalField(max_digits=5, decimal_places=2)
-    parcel_dimensions = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
-
-    @property
-    def pickup_location(self):
-        return self.ride.pickup_location
-
-    @property
-    def dropoff_location(self):
-        return self.ride.destination
-"""
 
 # Request model
 class Request(models.Model):
@@ -189,3 +135,40 @@ class Parcel(Request):
     parcel_weight = models.DecimalField(max_digits=5, decimal_places=2)
     parcel_dimensions = models.CharField(max_length=255)
     ride = models.ForeignKey(Ride, on_delete=models.CASCADE, null=True, blank=True)
+    
+class Review(models.Model):
+    RATING_CHOICES = [
+        (1, '1 star'),
+        (2, '2 stars'),
+        (3, '3 stars'),
+        (4, '4 stars'),
+        (5, '5 stars'),
+    ]
+
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    review = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review for {self.driver.user.username} by {self.user.username}"
+       
+class CustomerReview(models.Model):
+    RATING_CHOICES = [
+        (1, '1 star'),
+        (2, '2 stars'),
+        (3, '3 stars'),
+        (4, '4 stars'),
+        (5, '5 stars'),
+    ]
+
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    review = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review for {self.customer.username} by {self.driver.user.username}"

@@ -6,10 +6,11 @@ from django.contrib import admin
 
 
 
-from .models import Driver, Ride, User
+from .models import Driver, Ride, User, Parcel
 
 
 
 admin.site.register(User)
 admin.site.register(Driver)
 admin.site.register(Ride)
+admin.site.register(Parcel)

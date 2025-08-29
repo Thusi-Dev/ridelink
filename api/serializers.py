@@ -1,17 +1,12 @@
 from rest_framework import serializers
-
-
-
-
-
-
-from .models import User, Driver, Review, Ride, CustomerReview, Parcel, Driver
+from .models import User, Driver, Review, Ride, CustomerReview, Parcel
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
 
+        fields = ['id', 'username', 'email']
+        
 class DriverSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
@@ -19,18 +14,38 @@ class DriverSerializer(serializers.ModelSerializer):
         model = Driver
         fields = ['id', 'user', 'license_number']
         
-"""
+# Ride Serializer
 class RideSerializer(serializers.ModelSerializer):
-	pickup_location = serializers.ReadOnlyField(source='pickup_location')
-	dropoff_location = serializers.ReadOnlyField(source='destination')
-	driver = DriverSerializer()
-	user = UserSerializer()
-	
-	class Meta:
-		model = Ride
-		fields = ['id', 'driver', 'user', 'pickup_location', 'dropoff_location', 'ride_type', 'status']
-"""
+    pickup_location = serializers.ReadOnlyField(source='pickup_location')
+    dropoff_location = serializers.ReadOnlyField(source='dropoff_location')
+    driver = DriverSerializer()
+    user = UserSerializer()
 
+    class Meta:
+        model = Ride
+        fields = ['id', 'driver', 'user', 'pickup_location', 'dropoff_location', 'ride_type', 'status']
+
+# RideCreate serializer
+class RideCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ride
+        fields = ['pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'ride_type']
+        
+# Parcel serializer
+class ParcelSerializer(serializers.ModelSerializer):
+    ride = RideSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = Parcel
+        fields = '__all__'
+        
+# ParcelCreate serializer
+class ParcelCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parcel
+        fields = ['ride', 'parcel_type', 'parcel_weight', 'parcel_dimensions']
+        
 class ReviewSerializer(serializers.ModelSerializer):
     driver = DriverSerializer()
     user = UserSerializer()
@@ -95,35 +110,3 @@ class RegisterSerializer(serializers.ModelSerializer):
             return User.objects.create_user(**validated_data)
         except IntegrityError:
             raise serializers.ValidationError('Username or email already exists')
-
-# Ride Serializer
-class RideSerializer(serializers.ModelSerializer):
-    pickup_location = serializers.ReadOnlyField(source='pickup_location')
-    dropoff_location = serializers.ReadOnlyField(source='dropoff_location')
-    driver = DriverSerializer()
-    user = UserSerializer()
-
-    class Meta:
-        model = Ride
-        fields = ['id', 'driver', 'user', 'pickup_location', 'dropoff_location', 'ride_type', 'status']
-
-# RideCreate serializer
-class RideCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ride
-        fields = ['pickup_latitude', 'pickup_longitude', 'dropoff_latitude', 'dropoff_longitude', 'ride_type']
-        
-# Parcel serializer
-class ParcelSerializer(serializers.ModelSerializer):
-    ride = RideSerializer()
-    user = UserSerializer()
-
-    class Meta:
-        model = Parcel
-        fields = '__all__'
-        
-# ParcelCreate serializer
-class ParcelCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Parcel
-        fields = ['ride', 'parcel_type', 'parcel_weight', 'parcel_dimensions']
