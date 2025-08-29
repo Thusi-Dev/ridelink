@@ -120,7 +120,8 @@ class CustomerReview(models.Model):
 
     def __str__(self):
         return f"Review for {self.customer.username} by {self.driver.user.username}"
-        
+
+"""      
 class Parcel(models.Model):
     ride = models.ForeignKey(Ride, on_delete=models.CASCADE)
     parcel_type = models.CharField(max_length=255)
@@ -136,6 +137,7 @@ class Parcel(models.Model):
     @property
     def dropoff_location(self):
         return self.ride.destination
+"""
 
 # Request model
 class Request(models.Model):
